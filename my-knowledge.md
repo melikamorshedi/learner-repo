@@ -14,6 +14,15 @@ example useful command
 sudo netstat -tulpn
 ```
 
+## Docker Compose
+
+How to see logs using docker compose.
+
+How to start a docker compose stack.
+
+
+
+
 
 
 
