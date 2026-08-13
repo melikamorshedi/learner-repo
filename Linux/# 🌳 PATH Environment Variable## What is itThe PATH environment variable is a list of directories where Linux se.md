@@ -1,285 +1,237 @@
-~~~bash
-# 🌳 PATH Environment Variable
+# 📄 Linux Environment Variables
 
-## What is it?
+## 🌍 What Are Environment Variables?
 
-The **PATH** environment variable is a list of directories where Linux searches for executable programs (commands).
+Environment variables store information used by the shell and programs.
 
-When you type a command like:
+Examples:
 
 ```bash
-ls
+echo "$HOME"
+echo "$USER"
+echo "$SHELL"
 ```
 
-Linux does **not** magically know where `ls` is located.
+A variable uses this format:
 
-Instead, it checks each directory listed inside the **PATH** variable until it finds the executable.
+```bash
+NAME=value
+```
+
+> ⚠️ No spaces around `=`.
+> 
 
 ---
 
-## Why use it?
+# 👀 Viewing Variables
 
-Without PATH, you would need to type the full path for every command.
+### 🌳 `echo`
 
-Instead of:
-
-```bash
-ls
-```
-
-you would have to type:
+Show a variable:
 
 ```bash
-/bin/ls
+echo "$HOME"
 ```
 
-PATH makes commands shorter and easier to use.
-
----
-
-## How PATH Works
-
-Suppose your PATH contains:
-
-```text
-/usr/local/bin
-/usr/bin
-/bin
-```
-
-When you type:
+Without `$`, Bash treats it as normal text:
 
 ```bash
-date
-```
-
-Linux searches in this order:
-
-```
-1. /usr/local/bin/date
-2. /usr/bin/date
-3. /bin/date
-```
-
-The first matching executable is executed.
-
-If Linux cannot find it anywhere:
-
-```
-bash: date: command not found
-```
-
----
-
-## View Your Current PATH
-
-```bash
-echo $PATH
-```
-
-Example output:
-
-```text
-/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-```
-
-Directories are separated by **colons (`:`)**.
-
----
-
-## Display PATH More Readably
-
-Instead of one long line:
-
-```bash
-echo $PATH
-```
-
-display each directory on its own line:
-
-```bash
-echo "${PATH//:/$'\n'}"
+echo HOME
 ```
 
 Output:
 
-```text
-/usr/local/sbin
-/usr/local/bin
-/usr/sbin
-/usr/bin
-/sbin
-/bin
 ```
-
-This is much easier to read.
-
----
-
-# What Happens When You Run a Command?
-
-Suppose you type:
-
-```bash
-ping google.com
-```
-
-Linux performs these steps:
-
-1. Reads your command.
-2. Looks through every directory in `$PATH`.
-3. Finds the executable.
-4. Executes the program.
-5. Displays the output.
-6. Waits for the next command.
-
----
-
-## Find Where a Command Is Located
-
-### Using `which`
-
-```bash
-which ls
-```
-
-Output:
-
-```text
-/bin/ls
-```
-
-Another example:
-
-```bash
-which nano
-```
-
-Output:
-
-```text
-/usr/bin/nano
+HOME
 ```
 
 ---
 
-### Using `command -v`
+### 🌳 `printenv`
+
+Show all environment variables:
 
 ```bash
-command -v python3
+printenv
 ```
 
-Output:
-
-```text
-/usr/bin/python3
-```
-
-This is more reliable than `which` because it's a Bash built-in.
-
----
-
-### Using `type`
+Show one variable:
 
 ```bash
-type ls
+printenv HOME
 ```
 
-Output:
-
-```text
-ls is /usr/bin/ls
-```
-
-Unlike `which`, `type` also tells you if something is:
-
-- an alias
-- a shell builtin
-- a function
-- an executable file
-
-Example:
+Show multiple:
 
 ```bash
-type cd
-```
-
-Output:
-
-```text
-cd is a shell builtin
+printenv HOME USER PATH
 ```
 
 ---
 
-## Show Every Matching Command
+### 🌳 `env`
 
-Sometimes multiple versions of a command exist.
+Show environment variables:
 
 ```bash
-which -a python
+env
 ```
 
-or
+---
+
+### 🌳 `set`
+
+Show shell variables, environment variables, and functions:
 
 ```bash
-type -a python
+set
+```
+
+Because the output is large:
+
+```bash
+set | less
+```
+
+---
+
+# 🆚 Shell Variable vs Environment Variable
+
+### Shell variable
+
+```bash
+MY_VAR="hello"
+```
+
+Available in the current shell.
+
+### Environment variable
+
+```bash
+export MY_VAR="hello"
+```
+
+Available to the current shell **and child processes**.
+
+Test it:
+
+```bash
+bash -c 'printenv MY_VAR'
+```
+
+---
+
+# ➕ Creating Variables
+
+Create a temporary variable:
+
+```bash
+XYZ="test"
+```
+
+Check it:
+
+```bash
+echo "$XYZ"
+```
+
+Output:
+
+```
+test
+```
+
+Export it:
+
+```bash
+export XYZ
+```
+
+Or do both at once:
+
+```bash
+export XYZ="test"
+```
+
+---
+
+# 🎯 Variable for One Command
+
+You can set a variable only for one command:
+
+```bash
+DEBUG=1 printenv DEBUG
+```
+
+After the command finishes:
+
+```bash
+echo "$DEBUG"
+```
+
+The variable is not set in the current shell.
+
+---
+
+# ➖ Removing Variables
+
+Use `unset`:
+
+```bash
+unset XYZ
+```
+
+Check:
+
+```bash
+printenv XYZ
+```
+
+---
+
+# 🛣️ `$PATH`
+
+`PATH` contains directories where Linux searches for executable commands.
+
+View it:
+
+```bash
+echo "$PATH"
 ```
 
 Example:
 
-```text
-/usr/bin/python
-/usr/local/bin/python
 ```
+/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+```
+
+Directories are separated by `:`.
 
 ---
 
-# Add a Directory to PATH
+## ➕ Add to `$PATH`
 
-Imagine you have your own scripts inside:
+### Temporarily
 
-```text
-~/scripts
-```
-
-Normally you'd have to run:
+Add to the beginning:
 
 ```bash
-~/scripts/backup.sh
+export PATH="$HOME/bin:$PATH"
 ```
 
-Instead, add the directory to PATH.
+Add to the end:
+
+```bash
+export PATH="$PATH:/opt/bin"
+```
+
+The change normally lasts only for the current shell session.
 
 ---
 
-## Temporary PATH
+# 💾 Make Variables Permanent
 
-Only lasts until the terminal closes.
-
-```bash
-export PATH="$HOME/scripts:$PATH"
-```
-
-Verify:
-
-```bash
-echo $PATH
-```
-
-Now you can simply run:
-
-```bash
-backup.sh
-```
-
-from anywhere.
-
----
-
-## Permanent PATH
-
-Open:
+For Bash interactive shells:
 
 ```bash
 nano ~/.bashrc
@@ -288,10 +240,10 @@ nano ~/.bashrc
 Add:
 
 ```bash
-export PATH="$HOME/scripts:$PATH"
+export EDITOR="nano"
+export MY_VAR="hello"
+export PATH="$HOME/bin:$PATH"
 ```
-
-Save the file.
 
 Reload:
 
@@ -299,273 +251,194 @@ Reload:
 source ~/.bashrc
 ```
 
-Now the change remains after reboot.
+> `source` applies the changes to the current shell.
+> 
 
 ---
 
-# Remove a Directory from PATH
+# 🔐 System-Wide Variables
 
-PATH is usually configured in:
+### `/etc/environment`
 
-```text
-~/.bashrc
-```
-
-or system-wide in:
-
-```text
-/etc/environment
-```
-
-Simply remove the unwanted directory and reload:
-
-```bash
-source ~/.bashrc
-```
-
----
-
-# PATH Priority
-
-Linux searches directories **from left to right**.
+Used for system-wide login environment variables.
 
 Example:
 
-```text
-PATH=/home/meli/bin:/usr/local/bin:/usr/bin:/bin
+```
+JAVA_HOME=/usr/lib/jvm/default-java
 ```
 
-If `python` exists in:
-
-```
-/home/meli/bin
-/usr/bin
-```
-
-Linux executes:
-
-```
-/home/meli/bin/python
-```
-
-because it appears first.
-
-This is called **PATH precedence**.
+Do **not** use `export` here.
 
 ---
 
-# Executing Programs Without PATH
+### `/etc/profile.d/`
 
-Suppose you're inside a directory containing:
+Useful for system-wide shell configuration.
 
-```text
-hello.sh
-```
-
-Typing:
+Create a file:
 
 ```bash
-hello.sh
+sudo nano /etc/profile.d/custom.sh
 ```
 
-usually gives:
-
-```text
-command not found
-```
-
-because the current directory (`.`) is **not** in PATH.
-
-Instead use:
+Add:
 
 ```bash
-./hello.sh
+export APP_ENV="production"
 ```
 
-The `./` means:
-
-> Execute the file from the current directory.
+This can apply to users when they start a new login shell.
 
 ---
 
-# Common PATH Directories
+# 👤 New User Defaults
 
-| Directory | Purpose |
-|-----------|---------|
-| `/bin` | Essential user commands |
-| `/usr/bin` | Most user applications |
-| `/usr/local/bin` | Locally installed programs |
-| `/sbin` | System administration commands |
-| `/usr/sbin` | Administrative utilities |
-| `~/bin` | User's personal commands |
-
----
-
-# Useful Commands
-
-### Show PATH
+`/etc/skel/` contains files copied into the home directory when a new user is created.
 
 ```bash
-echo $PATH
+ls /etc/skel/
 ```
+
+Changes here affect **new users**, not existing users.
 
 ---
 
-### Find command location
+# 🔢 `SHLVL`
+
+Shows the current Bash shell level:
 
 ```bash
-which docker
+echo "$SHLVL"
 ```
 
----
-
-### Better command lookup
+Start another shell:
 
 ```bash
-command -v docker
+bash
 ```
 
----
-
-### Display command type
+Check again:
 
 ```bash
-type docker
+echo "$SHLVL"
 ```
+
+Each new Bash subshell increases the value.
 
 ---
 
-### Show all matches
+# 📋 Important Environment Variables
+
+| Variable | Meaning |
+| --- | --- |
+| `$HOME` | User's home directory |
+| `$USER` | Current username |
+| `$SHELL` | User's login shell |
+| `$PATH` | Command search directories |
+| `$PWD` | Current directory |
+| `$OLDPWD` | Previous directory |
+| `$HOSTNAME` | Computer hostname |
+| `$LANG` | System language/locale |
+| `$TERM` | Terminal type |
+| `$EDITOR` | Default text editor |
+| `$UID` | User ID |
+| `$PPID` | Parent process ID |
+| `$SHLVL` | Bash shell level |
+| `$HISTSIZE` | Number of history commands |
+| `$HISTFILE` | History file location |
+| `$LOGNAME` | Login name |
+
+---
+
+# 🧪 Practice
+
+Create and export a variable:
 
 ```bash
-type -a python
+export APP_ENV="development"
 ```
 
----
-
-### Add directory temporarily
+Check it:
 
 ```bash
-export PATH="$HOME/scripts:$PATH"
+echo "$APP_ENV"
 ```
 
----
-
-### Reload Bash configuration
+Check whether it is exported:
 
 ```bash
-source ~/.bashrc
+printenv APP_ENV
 ```
 
----
-
-# Common Problems
-
-## command not found
-
-Possible causes:
-
-- Program isn't installed.
-- Directory isn't in PATH.
-- File isn't executable.
-
-Check:
+Open a child shell:
 
 ```bash
-which command_name
+bash
 ```
 
-or
+Check again:
 
 ```bash
-command -v command_name
+echo "$APP_ENV"
 ```
 
----
-
-## Permission denied
-
-The file exists but isn't executable.
-
-Give execute permission:
+Exit:
 
 ```bash
-chmod +x script.sh
+exit
 ```
 
-Then run:
+Remove it:
 
 ```bash
-./script.sh
+unset APP_ENV
 ```
 
 ---
 
-# PATH vs Current Directory
+# 📝 Quick Summary
 
-| Command | Meaning |
-|----------|---------|
-| `ls` | Search PATH for `ls` |
-| `/bin/ls` | Execute using absolute path |
-| `./script.sh` | Execute from current directory |
+| Task | Command |
+| --- | --- |
+| Show variable | `echo "$VAR"` |
+| Show all environment variables | `env` / `printenv` |
+| Show all variables | `set` |
+| Create shell variable | `VAR=value` |
+| Create environment variable | `export VAR=value` |
+| Remove variable | `unset VAR` |
+| Temporary variable | `VAR=value command` |
+| Add to PATH | `export PATH="$PATH:/dir"` |
+| Reload `.bashrc` | `source ~/.bashrc` |
+| User configuration | `~/.bashrc` |
+| System-wide environment | `/etc/environment` |
+| System-wide shell config | `/etc/profile.d/` |
+| New-user defaults | `/etc/skel/` |
 
 ---
 
-# Tips
+# 🧠 Key Concept
 
-💡 PATH only stores **directories**, not individual commands.
+```
+Shell Variable
+      ↓
+export
+      ↓
+Environment Variable
+      ↓
+Inherited by child processes
+```
 
-💡 Linux searches directories **from left to right**.
-
-💡 Avoid adding duplicate directories to PATH.
-
-💡 Use `$HOME` instead of hardcoding your username.
-
-Example:
+The most important difference:
 
 ```bash
-export PATH="$HOME/bin:$PATH"
+MY_VAR="hello"
 ```
 
-instead of
+⬆️ Current shell only
 
 ```bash
-export PATH="/home/meli/bin:$PATH"
+export MY_VAR="hello"
 ```
 
----
-
-# Best Use Cases
-
-Use PATH when you want to:
-
-- Run your own scripts from anywhere.
-- Install custom software.
-- Configure development tools.
-- Set up programming environments.
-- Customize your shell environment.
-
----
-
-# Cheat Sheet
-
-| Command | Description |
-|----------|-------------|
-| `echo $PATH` | Show PATH |
-| `echo "${PATH//:/$'\n'}"` | Display PATH one directory per line |
-| `which ls` | Find command location |
-| `command -v ls` | Better way to find a command |
-| `type ls` | Show command type |
-| `type -a python` | Show all matching executables |
-| `export PATH="$HOME/bin:$PATH"` | Temporarily add a directory |
-| `nano ~/.bashrc` | Permanently modify PATH |
-| `source ~/.bashrc` | Reload Bash configuration |
-| `./script.sh` | Run a script from the current directory |
-
----
-
-📌 **LPIC-1 / DevOps Tip**
-
-Understanding the **PATH** variable is essential for Linux administration. You'll frequently modify it when installing tools like **Docker**, **kubectl**, **Terraform**, **AWS CLI**, **Go**, **Node.js**, or when creating your own Bash scripts. A solid understanding of PATH also helps you troubleshoot **"command not found"** errors and control which version of a program Linux executes.
-~~~
-
+⬆️ Current shell + child processes
