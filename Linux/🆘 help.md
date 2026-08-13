@@ -1,3 +1,5 @@
+📄 Getting Help in Linux
+
 Linux provides several ways to learn how a command works without searching the internet.
 
 The main tools are:
